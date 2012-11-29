@@ -1,0 +1,69 @@
+﻿<html>
+
+<head>
+
+<meta charset="utf-8">
+
+<title>Leaflet Testseite</title>
+
+<link rel="stylesheet" href="leaflet/leaflet.css" />
+<link rel="stylesheet" href="leaflet-plugins/L.Control.Locate.css" />
+<!--[if lte IE 8]>
+    <link rel="stylesheet" href="leaflet/leaflet.ie.css" />
+	<link rel="stylesheet" href="leaflet-plugins/L.Control.Locate.ie.css" />
+<![endif]-->
+
+<style type="text/css">
+body {
+	padding: 0;
+	margin: 0;
+}
+html, body, #map {
+	height: 100%;
+}
+</style>
+
+<script src="leaflet/leaflet.js"></script>
+<script src="leaflet-plugins/L.Control.Locate.js"></script>
+
+<script type="application/javascript">
+
+function init(){
+	var map = new L.Map('map');
+	
+	var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+	var osmAttrib = 'Map data © OpenStreetMap contributors';
+	var osm = new L.TileLayer(osmUrl, {minZoom: 1, maxZoom: 18, attribution: osmAttrib});
+	
+	var austroxUrl = 'http://rfmtc.no-ip.org/osm/austrox/tiles/austrox/{z}/{x}/{y}.png';
+	var austroxAttrib = 'Map data © OpenStreetMap contributors - Style AustroX (c) by Thomas Rupprecht';
+	var austrox = new L.TileLayer(austroxUrl, {minZoom: 1, maxZoom: 18, attribution: austroxAttrib}).addTo(map);
+
+	// start the map in South-East England
+	map.setView(new L.LatLng(47.8934, 16.1055),12);
+	var marker = L.marker([47.8934, 16.1055]).addTo(map);
+	
+	var baseLayers = {
+		"OSM": osm,
+		"AustoX": austrox
+	};
+	
+	var overlays = {
+		"Marker": marker
+	};
+	
+	L.control.layers(baseLayers, overlays).addTo(map);
+	L.control.locate().addTo(map);
+}
+
+</script>
+
+</head>
+
+<body onLoad="init()">
+
+<div id="map"></div>
+
+</body>
+
+</html>
