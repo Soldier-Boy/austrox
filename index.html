@@ -26,41 +26,7 @@ html, body, #map {
 <script src="leaflet/leaflet.js"></script>
 <script src="leaflet-plugins/L.Control.Locate.js"></script>
 
-<script type="application/javascript">
-
-function init(){
-	var map = new L.Map('map',
-	{
-		center: [47.8934, 16.1055],
-		zoom: 13,
-		minZoom: 1,
-		maxZoom: 18
-	});
-	
-	var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-	var osmAttrib = 'Map data © OpenStreetMap contributors';
-	var osm = new L.TileLayer(osmUrl, {attribution: osmAttrib});
-	
-	var austroxUrl = 'http://rfmtc.no-ip.org/osm/austrox/tiles/austrox/{z}/{x}/{y}.png';
-	var austroxAttrib = 'Map data © OpenStreetMap contributors - MapStyle AustroX (c) by Thomas Rupprecht';
-	var austrox = new L.TileLayer(austroxUrl, {attribution: austroxAttrib}).addTo(map);
-	
-	var marker = L.marker([47.8934, 16.1055]).addTo(map);
-	
-	var baseLayers = {
-		"OSM": osm,
-		"AustoX": austrox
-	};
-	
-	var overlays = {
-		"Marker": marker
-	};
-	
-	L.control.layers(baseLayers, overlays).addTo(map);
-	L.control.locate().addTo(map);
-}
-
-</script>
+<script src="init.js"></script>
 
 </head>
 

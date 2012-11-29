@@ -44,7 +44,7 @@ L.Control.Locate = L.Control.extend({
         var wrapper = L.DomUtil.create('div', className + "-wrap", container);
         var link = L.DomUtil.create('a', className, wrapper);
         link.href = '#';
-        link.title = 'Show me where I am';
+        link.title = 'Wo bin ich?';
 
         var _log = function(data) {
             if (self.options.debug) {
@@ -115,7 +115,7 @@ L.Control.Locate = L.Control.extend({
 
             // small inner marker
             L.circleMarker(self._event.latlng, self.options.markerStyle)
-                .bindPopup("You are within " + radius.toFixed(0) + " meters from this point")
+                .bindPopup("Du bist innerhalb " + radius.toFixed(0) + " Meter von diesem Punkt")
                 .addTo(self._layer);
 
             if (!self._container)
