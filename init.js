@@ -44,7 +44,6 @@ function init(){
 	//layer-control
 	L.control.layers(baseLayers, overlays).addTo(map);
 	L.control.scale().addTo(map);
-	L.Control.Zoomslider().addTo(map);
 	
 	getjson();
 	map.on('moveend', getjson);
