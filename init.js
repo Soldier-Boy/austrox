@@ -1,6 +1,8 @@
+var map, ids = {};
+
 function init(){
 	//init map
-	var map = new L.Map('map',
+	map = new L.Map('map',
 	{
 		minZoom: 10,
 		maxZoom: 18,
@@ -40,4 +42,7 @@ function init(){
 	//layer-control
 	L.control.layers(baseLayers, overlays).addTo(map);
 	L.control.scale().addTo(map);
+	
+	getjson();
+	map.on('moveend', getjson);
 }
