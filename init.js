@@ -1,4 +1,4 @@
-var map, ids = {};
+var map, hydranten, ids = {};
 
 function init(){
 	//init map
@@ -28,6 +28,7 @@ function init(){
 	);
 	
 	var marker = L.marker([47.8934, 16.1055]).addTo(map);
+	hydranten = L.layerGroup().addTo(map);
 	
 	//base-layers
 	var baseLayers = {
@@ -36,7 +37,8 @@ function init(){
 	};
 	//overlays
 	var overlays = {
-		"Marker": marker
+		"Marker": marker,
+		"Hydranten": hydranten
 	};
 	
 	//layer-control

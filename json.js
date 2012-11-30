@@ -26,13 +26,15 @@ function getjson(){
 				function(ign, i){
 					if(i.id in ids) return;
 					ids[i.id] = true;
-					L.marker(
-						[i.lat, i.lon],
-						{
-							icon: restaurantIcon,
-							title: i.tags.name
-						}
-					).bindPopup(poiInfo(i.tags)).addTo(map);
+					hydranten.addLayer(
+						L.marker(
+							[i.lat, i.lon],
+							{
+								icon: restaurantIcon,
+								title: i.tags.name
+							}
+						).bindPopup(poiInfo(i.tags))
+					);
 				}
 			);
 		}
