@@ -1,50 +1,77 @@
-var map, hydranten, ids = {};
+var map,hydranten;
+$(function(){
+	map = initMap();
+	var baseLayers = getBaseLayers();
+	var overlays = getOverlays();
+	addLayers(map,baseLayers,overlays);	
+	addControls(map,baseLayers,overlays);
+	//changeLayer(overlays,name,status);
+	
+	getJson();
+	map.on('moveend',getJson);
+});
 
-function init(){
-	//init map
-	map = new L.Map('map',
+function initMap(){
+	var maxB = new L.LatLngBounds(new L.LatLng(47.84,15.87),new L.LatLng(47.98,16.28));
+	var fitB = new L.LatLngBounds(new L.LatLng(47.87,16.00),new L.LatLng(47.96,16.16));
+	
+	return new L.Map('map',
 	{
 		minZoom: 10,
 		maxZoom: 18,
-		maxBounds: [[47.84,15.87],[47.98,16.28]]
+		maxBounds: maxB
 	}).fitBounds(
-		[[47.87,16.0],[47.96,16.16]]
+		fitB
 	).locate({
+		watch: true,
 		setView: true,
 		maxZoom: 17
 	});
-	
-	//layers
-	//layer-austrox
+}
+
+function getBaseLayers(){
 	var austrox = new L.TileLayer(
 		//'http://rfmtc.no-ip.org/osm/austrox/tiles/austrox/{z}/{x}/{y}.png',
 		'http://192.168.0.100/osm/austrox/tiles/austrox/{z}/{x}/{y}.png',
 		{ attribution: 'Map data © OpenStreetMap contributors - MapStyle AustroX (c) by Thomas Rupprecht' }
-	).addTo(map);
-	//layer-osm
+	);
+	
 	var osm = new L.TileLayer(
 		'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 		{ attribution: 'Map data © OpenStreetMap contributors' }
 	);
 	
-	var marker = L.marker([47.8934, 16.1055]).addTo(map);
-	hydranten = L.layerGroup().addTo(map);
-	
-	//base-layers
-	var baseLayers = {
-		"AustoX": austrox,
+	return {
+		"AustroX": austrox,
 		"OpenStreetMap": osm
 	};
-	//overlays
-	var overlays = {
+}
+
+function getOverlays(){
+	var marker = new L.marker(new L.LatLng(47.8934,16.1055));
+	hydranten = new L.layerGroup();
+	
+	return {
 		"Marker": marker,
 		"Hydranten": hydranten
 	};
+}
+
+function addLayers(map,baseLayers,overlays){
+	map.addLayer(baseLayers.AustroX);
 	
-	//layer-control
-	L.control.layers(baseLayers, overlays).addTo(map);
-	L.control.scale().addTo(map);
-	
-	getjson();
-	map.on('moveend', getjson);
+	map.addLayer(overlays.Hydranten);
+}
+
+function addControls(map,baseLayers,overlays){	
+	map.addControl(new L.Control.Scale());
+	map.addControl(new L.Control.Layers(baseLayers,overlays));
+}
+
+function changeLayer(overlays,name,status){
+	if(status == true){
+		overlays.addLayer(name);
+	}else{
+		overlays.removeLayer(name);
+	}
 }
