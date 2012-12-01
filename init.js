@@ -1,3 +1,5 @@
+var app_lang = 'de';
+
 $(function(){
 	var map = initMap();
 	var baseLayers = getBaseLayers();
@@ -6,8 +8,8 @@ $(function(){
 	addControls(map,baseLayers,overlays);
 	//changeLayer(overlays,name,status);
 	
-	getJson(map,overlays.Hydranten);
-	map.on('moveend',function(){getJson(map,overlays.Hydranten)});
+	getJson(map,overlays.Hydranten,'amenity=fire_station');
+	map.on('moveend',function(){getJson(map,overlays.Hydranten,'amenity=fire_station')});
 });
 
 function initMap(){
@@ -18,7 +20,7 @@ function initMap(){
 	{
 		minZoom: 10,
 		maxZoom: 18,
-		maxBounds: maxB
+		//maxBounds: maxB
 	}).fitBounds(
 		fitB
 	).locate({

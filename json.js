@@ -1,23 +1,17 @@
-function getJson(map,hydranten){
-	var ids = {};
-	
+function getJson(map,featureLayer,featureType){
 	//var overpass_url = 'http://overpass.osm.rambler.ru/cgi/interpreter?data=';
 	var overpass_url = 'http://overpass-api.de/api/interpreter?data=';
-	var overpass_query = overpass_url + '[out:json];node(' + map.getBounds().toOverpassBBoxString() + ')["emergency"="fire_hydrant"];out;';
+	var overpass_query = overpass_url + '[out:json];node(' + map.getBounds().toOverpassBBoxString() + ')[' + featureType + '];out;';
 	
-	var restaurantIcon = new L.icon({
-		iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAMAAABhEH5lAAAAXVBMVEUAAAD///+KU1P///////////////9xQED///9fMjJ1QkL///+jbm7///////////////////+XXFz///9pOjr///94RUVfMjL///////////9kNTWdYmL///9bLS2eoyA3AAAAHnRSTlMATKY/JkhAyBLwxUqIKhE9AkSZLtk0v/IFBkHmkTPuNN4DAAAAaElEQVR4Xp3INxbDIAAE0V2RlINz3Psf0zR6DwxuPMUUHz+ydI4W9+N23olqGvFmDk/mZF/SF70vGcW4nBIaOqkb3DWhaZTGiUpopcQ1I1AiKmT6gmYWhD/o0QcP+BC/Ny+mBVoTX+0DgJ0JB2LUDeEAAAAASUVORK5CYII=',
-		iconSize: new L.Point(18,18),
-		iconAnchor: new L.Point(9,9)
+	var featureIcon = getFeatureIcon('amenity=fire_station',16);
+	
+	featureLayer.eachLayer(function(layer){
+		if(map.getBounds().contains(layer.getLatLng())==false){
+			featureLayer.removeLayer(layer);
+		}
 	});
 	
-	var poiInfo = function(tags){
-		var r = $('<table>');
-		for(key in tags){
-			r.append($('<tr>').append($('<th>').text(key).css('text-align','left')).append($('<td>').text(tags[key])));
-		}
-		return $('<div>').append(r).html();
-	}
+	var ids = {};
 	
 	$.getJSON(
 		overpass_query,
@@ -25,26 +19,69 @@ function getJson(map,hydranten){
 			$.each(
 				data.elements,
 				function(ign, i){
-					if(i.id in ids) return;
-					ids[i.id] = true;
-					hydranten.addLayer(
-						new L.marker(
-							[i.lat, i.lon],
-							{
-								icon: restaurantIcon,
-								title: i.tags.name
-							}
-						).bindPopup(poiInfo(i.tags))
-					);
+					if(i.id in ids){
+						return;
+					}else{
+						ids[i.id] = true;
+						featureLayer.addLayer(
+							new L.marker(
+								new L.LatLng(i.lat,i.lon),
+								{
+									icon: featureIcon,
+									title: i.tags.name
+								}
+							).bindPopup(getPopupContent(i.tags,'amenity'))
+						);
+					}
 				}
 			);
 		}
 	);
 }
-
 	
 L.LatLngBounds.prototype.toOverpassBBoxString = function(){
 	var sw = this._southWest;
 	var ne = this._northEast;
 	return [sw.lat, sw.lng, ne.lat, ne.lng].join(',');
+}
+
+function getFeatureIcon(iconType,size){
+	return new L.icon({
+		iconUrl: 'icons/' + iconType + '.png',
+		iconSize: new L.Point(size,size),
+		iconAnchor: new L.Point(size/2,size/2)
+	});
+}
+
+function getPopupContent(tags,hideTag){
+	var r = $('<table>');
+	if(tags.name){
+		r.append($('<h2>').text(tags.name));
+	}
+	for(var key in tags){
+		if(key != 'name' && key != hideTag){
+			r.append($('<tr>').append($('<th>').text(translate(app_lang,key)).css('text-align','left')).append($('<td>').text(translate(app_lang,tags[key]))));
+		}
+	}
+	return $('<div>').append(r).html();
+}
+
+function translate(lang,value){
+	switch(value){
+		case 'fire_hydrant:type':
+			return 'Hydranten-Type:';
+			break;
+		case 'pillar':
+			return 'Überflur';
+			break;
+		case 'emergency':
+			return 'Notfall:';
+			break;
+		case 'fire_hydrant':
+			return 'Hydrant';
+			break;
+		default:
+			return value;
+			break;
+	}
 }
