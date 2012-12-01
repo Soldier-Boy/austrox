@@ -1,4 +1,4 @@
-function getJson(){
+function getJson(map,hydranten){
 	var ids = {};
 	
 	//var overpass_url = 'http://overpass.osm.rambler.ru/cgi/interpreter?data=';

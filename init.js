@@ -1,14 +1,13 @@
-var map,hydranten;
 $(function(){
-	map = initMap();
+	var map = initMap();
 	var baseLayers = getBaseLayers();
 	var overlays = getOverlays();
 	addLayers(map,baseLayers,overlays);	
 	addControls(map,baseLayers,overlays);
 	//changeLayer(overlays,name,status);
 	
-	getJson();
-	map.on('moveend',getJson);
+	getJson(map,overlays.Hydranten);
+	map.on('moveend',function(){getJson(map,overlays.Hydranten)});
 });
 
 function initMap(){
@@ -49,7 +48,7 @@ function getBaseLayers(){
 
 function getOverlays(){
 	var marker = new L.marker(new L.LatLng(47.8934,16.1055));
-	hydranten = new L.layerGroup();
+	var hydranten = new L.layerGroup();
 	
 	return {
 		"Marker": marker,
@@ -68,10 +67,10 @@ function addControls(map,baseLayers,overlays){
 	map.addControl(new L.Control.Layers(baseLayers,overlays));
 }
 
-function changeLayer(overlays,name,status){
+/*function changeLayer(overlays,name,status){
 	if(status == true){
 		overlays.addLayer(name);
 	}else{
 		overlays.removeLayer(name);
 	}
-}
+}*/
