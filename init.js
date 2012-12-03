@@ -7,9 +7,10 @@ $(function(){
 	addLayers(map,baseLayers,overlays);	
 	addControls(map,baseLayers,overlays);
 	//changeLayer(overlays,name,status);
-	
-	getJson(map,overlays.Hydranten,'amenity=fire_station');
-	map.on('moveend',function(){getJson(map,overlays.Hydranten,'amenity=fire_station')});
+	var title = 'emergency';
+	var showTags = ['fire_hydrant:type','fire_hydrant:diameter','fire_hydrant:pressure','fire_hydrant:position','fire_hydrant:count','fire_hydrant:reservoir'];
+	getJson(map,overlays.Hydranten,'emergency=fire_hydrant',title,showTags);
+	map.on('moveend',function(){getJson(map,overlays.Hydranten,'emergency=fire_hydrant',title,showTags)});
 });
 
 function initMap(){
@@ -49,11 +50,13 @@ function getBaseLayers(){
 }
 
 function getOverlays(){
-	var marker = new L.marker(new L.LatLng(47.8934,16.1055));
-	var hydranten = new L.layerGroup();
+	var polygon = new L.Polygon([new L.LatLng(47.89,16.10),new L.LatLng(47.95,16.12),new L.LatLng(47.87,16.12),new L.LatLng(47.87,16.18),new L.LatLng(47.85,16.18),new L.LatLng(47.87,16.10),new L.LatLng(47.89,16.10)]);
+	var marker = new L.Marker(polygon.getCenter());
+	var hydranten = new L.LayerGroup();
 	
 	return {
 		"Marker": marker,
+		"Polygon": polygon,
 		"Hydranten": hydranten
 	};
 }
@@ -62,6 +65,8 @@ function addLayers(map,baseLayers,overlays){
 	map.addLayer(baseLayers.AustroX);
 	
 	map.addLayer(overlays.Hydranten);
+	map.addLayer(overlays.Polygon);//delete
+	map.addLayer(overlays.Marker);//delete
 }
 
 function addControls(map,baseLayers,overlays){	
