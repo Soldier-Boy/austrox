@@ -5,13 +5,8 @@ function getJson(map,featureLayer,featureType){
 	
 	var featureIcon = getFeatureIcon('amenity=fire_station',16);
 	
-	featureLayer.eachLayer(function(layer){
-		if(map.getBounds().contains(layer.getLatLng())==false){
-			featureLayer.removeLayer(layer);
-		}
-	});
-	
 	var ids = {};
+	featureLayer.clearLayers();
 	
 	$.getJSON(
 		overpass_query,
@@ -54,16 +49,17 @@ function getFeatureIcon(iconType,size){
 }
 
 function getPopupContent(tags,hideTag){
-	var r = $('<table>');
+	var title = '';
 	if(tags.name){
-		r.append($('<h2>').text(tags.name));
+		title = $('<h2>').text(tags.name);
 	}
+	var table = $('<table>');
 	for(var key in tags){
 		if(key != 'name' && key != hideTag){
-			r.append($('<tr>').append($('<th>').text(translate(app_lang,key)).css('text-align','left')).append($('<td>').text(translate(app_lang,tags[key]))));
+			table.append($('<tr>').append($('<th>').text(translate(app_lang,key)).css('text-align','left')).append($('<td>').text(translate(app_lang,tags[key]))));
 		}
 	}
-	return $('<div>').append(r).html();
+	return $('<div>').append(title).append(table).html();
 }
 
 function translate(lang,value){

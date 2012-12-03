@@ -1,4 +1,4 @@
-var app_lang = 'de';
+﻿var app_lang = 'de';
 
 $(function(){
 	var map = initMap();
