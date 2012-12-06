@@ -1,41 +1,105 @@
 function getJson(map,featureLayer,featureType,title,showTags){
-	if(map.getZoom() < 12){
+	var nodes = {};
+	var ways = {};
+	var relations = {};
+	
+	//featureLayer.clearLayers();
+	
+	if(map.getZoom() < 8){
 		return;
 	}
 	
-	//var overpass_url = 'http://overpass.osm.rambler.ru/cgi/interpreter?data=';
-	var overpass_url = 'http://overpass-api.de/api/interpreter?data=';
-	var overpass_query = overpass_url + '[out:json];node(' + map.getBounds().toOverpassBBoxString() + ')[' + featureType + '];out;';
+	var overpass_url = 'http://overpass.osm.rambler.ru/cgi/interpreter?data=';
+	//var overpass_url = 'http://overpass-api.de/api/interpreter?data=';
+	//var overpass_query = overpass_url + '[out:json];node(' + map.getBounds().toOverpassBBoxString() + ')[' + featureType + '];out;';
+	//var overpass_query = overpass_url + '[out:json];(way(BBOX)TAGS;way(BBOX)TAGS;>;);out qt;'.replace(/(BBOX)/g, map.getBounds().toOverpassBBoxString()).replace(/TAGS/g, '[leisure=pitch][sport=soccer]');
+	var overpass_query = overpass_url + '[out:json];(relationTAGS;relationTAGS;way(r);relationTAGS;>;);out qt;'.replace(/TAGS/g, '[type=multipolygon][admin_level=8][name="Gemeinde Hernstein"]');
 	
 	var featureIcon = getFeatureIcon('amenity=fire_station',16);
 	
-	var ids = {};
-	featureLayer.clearLayers();
-	
 	$.getJSON(
 		overpass_query,
-		function(data){
+		function(data, textStatus){
+			alert(textStatus);
 			$.each(
 				data.elements,
-				function(ign, i){
-					if(i.id in ids){
-						return;
-					}else{
-						ids[i.id] = true;
-						featureLayer.addLayer(
-							new L.Marker(
-								new L.LatLng(i.lat,i.lon),
-								{
-									icon: featureIcon,
-									title: i.tags.name
-								}
-							).bindPopup(getPopupContent(i.id,i.tags,title,showTags))
-						);
+				function(index,obj){
+					switch(obj.type){
+						case 'node':
+							nodes[obj.id] = obj;
+						break;
+						case 'way':
+							ways[obj.id] = obj;
+						break;
+						case 'relation':
+							relations[obj.id] = obj;
+						break;
+						default:
+							alert('ERROR');
 					}
 				}
 			);
+			getGeo(featureLayer,nodes,ways,relations);
 		}
 	);
+	
+	/*for(node in nodes){
+		featureLayer.addLayer(
+			new L.Marker(
+				new L.LatLng(obj.lat,obj.lon),
+				{
+					icon: featureIcon,
+					title: obj.tags.name
+				}
+			).bindPopup(getPopupContent(obj.id,obj.tags,title,showTags))
+		);
+	}*/
+}
+
+/*for(var wayId in ways){
+			var way_nodes = [];
+			for(var i=0;i<ways[wayId].nodes.length;i++){
+				var nodeId = ways[wayId].nodes[i];
+				way_nodes[i] = new L.LatLng(nodes[nodeId].lat,nodes[nodeId].lon);
+			}
+			//featureLayer.addLayer(new L.Polygon(way_nodes));
+			featureLayer.addLayer(new L.Marker(new L.Polygon(way_nodes).getCenter()).bindPopup('Sportplatz'));
+		}*/
+
+function getGeo(featureLayer,nodes,ways,relations){
+	var j = 0;
+	for(var relId in relations){
+		var rel_ways = relations[relId].members;
+		var rel_nodes = [];
+		var i = 0;
+		var last_nodeId;
+		var last_way_nodeId;
+		for(var way in rel_ways){
+			if(rel_ways[way].role == 'outer'){
+				var wayId = rel_ways[way].ref;
+				if(last_way_nodeId != ways[wayId].nodes[0] && i > 0){
+					var way_nodes = ways[wayId].nodes.reverse();
+				}else{
+					var way_nodes = ways[wayId].nodes;
+				}
+				for(var node in way_nodes){
+					var nodeId = way_nodes[node];
+					var new_node = new L.LatLng(nodes[nodeId].lat,nodes[nodeId].lon);
+					if(nodeId != last_nodeId){
+						rel_nodes[i] = new_node;
+						i++;
+					}
+					last_nodeId = nodeId;
+				}
+				last_way_nodeId = last_nodeId;
+			}
+		}
+		var poly = new L.Polygon(rel_nodes).bindPopup(relations[relId].tags.name);
+		featureLayer.addLayer(poly);
+		featureLayer.addLayer(new L.Marker(poly.getCenter()).bindPopup(relations[relId].tags.name));
+		j = j+i;
+	}
+	alert(j);
 }
 	
 L.LatLngBounds.prototype.toOverpassBBoxString = function(){
