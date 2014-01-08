@@ -1,16 +1,13 @@
 ﻿var app_lang = 'de';
 
+var map,baseLayers,overlays;
+
 $(function(){
-	var map = initMap();
-	var baseLayers = getBaseLayers();
-	var overlays = getOverlays();
-	addLayers(map,baseLayers,overlays);	
-	addControls(map,baseLayers,overlays);
-	//changeLayer(overlays,name,status);
-	var title = 'emergency';
-	var showTags = ['fire_hydrant:type','fire_hydrant:diameter','fire_hydrant:pressure','fire_hydrant:position','fire_hydrant:count','fire_hydrant:reservoir'];
-	//getJson(map,overlays.Hydranten,'emergency=fire_hydrant',title,showTags);
-	//map.on('moveend',function(){getJson(map,overlays.Hydranten,'emergency=fire_hydrant',title,showTags)});
+	map = initMap();
+	baseLayers = getBaseLayers();
+	//var overlays = getOverlays();
+	addLayers();
+	addControls();
 });
 
 function initMap(){
@@ -19,9 +16,9 @@ function initMap(){
 	
 	return new L.Map('map',
 	{
-		//minZoom: 10,
+		minZoom: 10,
 		maxZoom: 18,
-		//maxBounds: maxB
+		maxBounds: maxB
 	}).fitBounds(
 		fitB
 	).locate({
@@ -33,8 +30,7 @@ function initMap(){
 
 function getBaseLayers(){
 	var austrox = new L.TileLayer(
-		//'http://rfmtc.no-ip.org/osm/austrox/tiles/austrox/{z}/{x}/{y}.png',
-		'http://192.168.0.100/osm/austrox/tiles/austrox/{z}/{x}/{y}.png',
+		'http://rfmtc.no-ip.org/osm/austrox/tiles/{z}/{x}/{y}.png',
 		{ attribution: 'Map data © OpenStreetMap contributors - MapStyle AustroX (c) by Thomas Rupprecht' }
 	);
 	
@@ -49,51 +45,21 @@ function getBaseLayers(){
 	};
 }
 
-function getOverlays(){
-	var multipolygon = new L.MultiPolygon(
-	[
-		[
-			[
-				new L.LatLng(47.89,16.10),new L.LatLng(47.95,16.12),new L.LatLng(47.89,16.20),new L.LatLng(47.89,16.18),new L.LatLng(47.85,16.18),new L.LatLng(47.87,16.10),new L.LatLng(47.89,16.10)
-			],[
-				new L.LatLng(47.90,16.12),new L.LatLng(47.94,16.13),new L.LatLng(47.89,16.17),new L.LatLng(47.90,16.12)
-			],[
-				new L.LatLng(47.89,16.12),new L.LatLng(47.88,16.17),new L.LatLng(47.87,16.13),new L.LatLng(47.89,16.12)
-			]
-		],[
-			[
-				new L.LatLng(47.19,16.10),new L.LatLng(47.25,16.12),new L.LatLng(47.19,16.20),new L.LatLng(47.19,16.18),new L.LatLng(47.15,16.18),new L.LatLng(47.17,16.10),new L.LatLng(47.19,16.10)
-			]
-		]
-	]
-	);
-	//var marker = new L.Marker(polygon.getCenter());
-	var hydranten = new L.LayerGroup();
-	
+/*function getOverlays(){
+
 	return {
-		//"Marker": marker,
-		"MultiPolygon": multipolygon,
-		"Hydranten": hydranten
+
 	};
-}
+}*/
 
-function addLayers(map,baseLayers,overlays){
+function addLayers(){
 	map.addLayer(baseLayers.AustroX);
-	
-	map.addLayer(overlays.Hydranten);
-	map.addLayer(overlays.MultiPolygon);//delete
-	//map.addLayer(overlays.Marker);//delete
+    //map.addLayer(baseLayers.OpenStreetMap);
+
+    //map.addLayer(overlays.xxx);
 }
 
-function addControls(map,baseLayers,overlays){	
+function addControls(){
 	map.addControl(new L.Control.Scale());
 	map.addControl(new L.Control.Layers(baseLayers,overlays));
 }
-
-/*function changeLayer(overlays,name,status){
-	if(status == true){
-		overlays.addLayer(name);
-	}else{
-		overlays.removeLayer(name);
-	}
-}*/
